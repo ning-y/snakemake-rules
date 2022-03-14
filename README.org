@@ -1,0 +1,13 @@
+A repository of Snakemake rules.
+
+* Why not wrappers?
+
+I think each workflow should be as self-contained as possible.
+Using wrappers introduces an additional dependency which may break, hindering the reproducibility of your pipeline.
+Plus, wrappers can be annoying to debug, since their body usually exists in some other file.
+
+* Conventions in this repository
+
+- Prefer named input/outputs :: The introduction of new input/outputs will often break shell/run directives if they depend on "positional" input/outputs.
+- Underscore names :: Underscore-prefixed names are implementation details which can be ignored.
+  For example, underscore-prefixed rules might download example data for testing; underscore-prefixed parameters might be automatically generated from the un-underscore-prefixed input/output/params values.

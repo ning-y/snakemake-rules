@@ -1,0 +1,58 @@
+import os, re
+
+rule igv_install:
+    output:
+        zip = temp("IGV_Linux_{version}_WithJava.zip"),
+        dir = directory("IGV_Linux_{version}")
+    wildcard_constraints: version = "\d+\.\d+\.\d+"  # major.minor.revision
+    params:
+        _wget_url = lambda wc: "https://data.broadinstitute.org/igv/projects/downloads/{xy}/IGV_Linux_{xyz}_WithJava.zip".format( \
+            xy=re.search("^\d+\.\d+", wc.version).group(0), xyz=wc.version),
+        _unzip_dir = lambda _, output: os.path.dirname(output.dir) \
+            if os.path.dirname(output.dir) != "" else "."
+    shell: """
+        wget --output-document={output.zip} {params._wget_url}
+        unzip {output.zip} -d {params._unzip_dir}"""
+
+rule igv_screenshot:
+    # input.igv_dir is output.dir from rule igv_install.
+    # Minimum width and height is 300x211 regardless of params.height and params.width
+    # Requires xvfb-run, which might be packaged as xvfb.
+    output:
+        png = "screenshot.png",
+        bth = temp("screenshot.batch"),
+        prf = temp("screenshot.pref")
+    input:
+        igv_dir = "IGV_Linux_2.12.3",
+        bam = "example.bam",
+        bai = "example.bam.bai"
+    params:
+        genome = "hg19", chrom = "chr17", pos_from = 41224614, pos_to = 41249080,
+        width = 1000, height = 600,
+        _snapshot_directory = lambda _, output: os.path.dirname(output.png),
+        _snapshot_filename = lambda _, output: os.path.basename(output.png)
+    shell: """
+        # The screenshot region is 89 px smaller than the height bounds, perhaps
+        # because the menu/toolbars are excluded.
+        echo "IGV.Bounds=0,0,{params.width},$(({params.height} + 89))" > {output.prf}
+        echo "
+            setSleepInterval 500
+            load {input.bam}
+            snapshotDirectory {params._snapshot_directory}
+            genome {params.genome}
+            goto {params.chrom}:{params.pos_from}-{params.pos_to}
+            squish
+            sort QUALITY
+            maxPanelHeight -1
+            snapshot {params._snapshot_filename}
+            exit" > {output.bth}
+        xvfb-run --auto-servernum \
+            --server-args="-screen 0 {params.width}x$(({params.height} + 89))x24" \
+            {input.igv_dir}/igv.sh --preferences {output.prf} --batch {output.bth}"""
+
+rule _igv_example:
+    output: bam = "example.bam", bai = "example.bam.bai"
+    params: url = "ftp://ftp.1000genomes.ebi.ac.uk/vol1/ftp/phase1/data/HG00154/alignment/HG00154.mapped.ILLUMINA.bwa.GBR.low_coverage.20101123.bam"
+    shell: """
+        samtools view -h {params.url} 17:41194312-41279381 -O bam > {output.bam}
+        samtools index {output.bam}"""
