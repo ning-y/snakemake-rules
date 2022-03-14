@@ -1,11 +1,12 @@
 rule imagemagick_str2img:
+    # Use convert -list font to browse available fonts.
     output: "str_image.png"
     params:
-        string = "Hello world!",
+        string = "Hello world!", font = "Noto-Mono",
         width = 1000, height = 600, bg = "white", fg = "black"
     conda: "imagemagick.yaml"
     shell: """
-        convert -background {params.bg} -fill {params.fg} \
+        convert -background {params.bg} -fill {params.fg} -font {params.font} \
             -size {params.width}x{params.height} \
             label:'{params.string}' {output}"""
 

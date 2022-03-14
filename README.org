@@ -18,7 +18,7 @@ All rule names are prefixed by their directory.
 
 I think each workflow should be as self-contained as possible.
 Using wrappers introduces an additional dependency which may break, hindering the reproducibility of your pipeline.
-Plus, wrappers can be annoying to debug, since their body usually exists in some other file.
+Plus, wrappers can be annoying to debug or even modify, since their body usually exists in some other file or repository.
 
 * Conventions in this repository
 
