@@ -18,6 +18,9 @@ rule igv_screenshot:
     # input.igv_dir is output.dir from rule igv_install.
     # Minimum width and height is 300x211 regardless of params.height and params.width
     # Requires xvfb-run, which might be packaged as xvfb.
+    # igv.sh argument "--port 0" dynamically assigns an "IGV command port number,"
+    #   which resolves warning messages about ports already in use when many
+    #   instances of IGV are concurrently run.
     output:
         png = "screenshot.png",
         bth = temp("screenshot.batch"),
@@ -48,7 +51,7 @@ rule igv_screenshot:
             exit" > {output.bth}
         xvfb-run --auto-servernum \
             --server-args="-screen 0 {params.width}x$(({params.height} + 89))x24" \
-            {input.igv_dir}/igv.sh --preferences {output.prf} --batch {output.bth}"""
+            {input.igv_dir}/igv.sh --port 0 --preferences {output.prf} --batch {output.bth}"""
 
 rule _igv_example:
     output: bam = "example.bam", bai = "example.bam.bai"
