@@ -1,5 +1,0 @@
-- igv_install ::
-  Downloads and unpacks IGV "with java," for use downstream in rule igv_screenshot.
-- igv_screenshot ::
-  Takes a screenshot of a BAM alignment in IGV.
-   /xvfb/ must be installed.

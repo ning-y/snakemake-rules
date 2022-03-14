@@ -1,0 +1,24 @@
+rule imagemagick_str2img:
+    output: "str_image.png"
+    params:
+        string = "Hello world!",
+        width = 1000, height = 600, bg = "white", fg = "black"
+    conda: "imagemagick.yaml"
+    shell: """
+        convert -background {params.bg} -fill {params.fg} \
+            -size {params.width}x{params.height} \
+            label:'{params.string}' {output}"""
+
+rule imagemagick_txt2img:
+    output: "txt_image.png"
+    input: "image.txt"
+    params: width = 1000, height = 600, bg = "white", fg = "black"
+    conda: "imagemagick.yaml"
+    shell: """
+        convert -background {params.bg} -fill {params.fg} \
+            -page {params.width}x{params.height} \
+            TEXT:{input} {output}"""
+
+rule _example_image_txt:
+    output: "image.txt"
+    shell: "echo Hello World > {output}"

@@ -1,5 +1,19 @@
 A repository of Snakemake rules.
 
+* Table of contents
+
+All rule names are prefixed by their directory.
+
+- igv_install ::
+  Downloads and unpacks IGV "with java," for use downstream in rule igv_screenshot.
+- igv_screenshot ::
+  Takes a screenshot of a BAM alignment in IGV.
+  /xvfb/ must be installed.
+- imagemagick_str2img ::
+  Renders a parameter string as an image.
+- imagemagick_txt2img ::
+  Renders a plain-text file as an image.
+
 * Why not wrappers?
 
 I think each workflow should be as self-contained as possible.
